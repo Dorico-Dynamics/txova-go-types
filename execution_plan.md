@@ -36,43 +36,45 @@
 
 ---
 
-## Phase 2: Money & Geographic Types (Week 2) - IN PROGRESS
+## Phase 2: Money & Geographic Types (Week 2) - COMPLETE
 
-### 2.1 Package: `money` - Currency Handling
-- [ ] Implement `Money` type with centavo-based storage
-- [ ] Implement constructors: `FromCentavos`, `FromMZN`, `Zero`
-- [ ] Implement arithmetic: `Add`, `Subtract`, `Multiply`
-- [ ] Implement `Percentage` for commission calculations
-- [ ] Implement `Split` for fare division
-- [ ] Implement comparison: `Equals`, `GreaterThan`, `LessThan`, `IsZero`, `IsNegative`, `IsPositive`
-- [ ] Implement `String` formatting as "150.00 MZN"
-- [ ] Implement JSON marshaling (as centavos integer)
-- [ ] Implement SQL Scanner and Valuer interfaces
-- [ ] Write comprehensive tests for all operations and edge cases
-
-**Deliverables:**
-- `money/` package with full MZN currency support
-- Test suite covering arithmetic precision, edge cases, and serialization
-
-### 2.2 Package: `geo` - Geographic Types
-- [ ] Implement `Location` type with latitude/longitude
-- [ ] Implement coordinate validation (valid ranges)
-- [ ] Implement `DistanceKM` using Haversine formula
-- [ ] Implement `BoundingBox` type with min/max coordinates
-- [ ] Implement `Contains` method for BoundingBox
-- [ ] Implement `Address` struct with all components
-- [ ] Implement `Province` enum for Mozambique provinces
-- [ ] Define Mozambique bounding box constant
-- [ ] Implement JSON and SQL interfaces for all types
-- [ ] Write comprehensive tests including distance calculations
+### 2.1 Package: `money` - Currency Handling - COMPLETE (95.2% coverage)
+- [x] Implement `Money` type with centavo-based storage
+- [x] Implement constructors: `FromCentavos`, `FromMZN`, `Zero`
+- [x] Implement arithmetic: `Add`, `Subtract`, `Multiply`
+- [x] Implement `Percentage` for commission calculations
+- [x] Implement `Split` for fare division
+- [x] Implement comparison: `Equals`, `GreaterThan`, `LessThan`, `IsZero`, `IsNegative`, `IsPositive`
+- [x] Implement `String` formatting as "150.00 MZN"
+- [x] Implement JSON marshaling (as centavos integer)
+- [x] Implement SQL Scanner and Valuer interfaces
+- [x] Write comprehensive tests for all operations and edge cases
 
 **Deliverables:**
-- `geo/` package with all geographic types
-- Test suite with real-world Mozambique coordinate tests
+- [x] `money/` package with full MZN currency support
+- [x] Test suite covering arithmetic precision, edge cases, and serialization
+
+### 2.2 Package: `geo` - Geographic Types - COMPLETE (96.2% coverage)
+- [x] Implement `Location` type with latitude/longitude
+- [x] Implement coordinate validation (valid ranges)
+- [x] Implement `DistanceKM` using Haversine formula
+- [x] Implement `BoundingBox` type with min/max coordinates
+- [x] Implement `Contains` method for BoundingBox
+- [x] Implement `Address` struct with all components
+- [x] Implement `Province` enum for Mozambique provinces
+- [x] Define Mozambique bounding box constant
+- [x] Implement JSON and SQL interfaces for all types
+- [x] Write comprehensive tests including distance calculations
+
+**Deliverables:**
+- [x] `geo/` package with all geographic types
+- [x] Test suite with real-world Mozambique coordinate tests
+
+**Commit:** `7a1fd43` - feat(money,geo): implement currency and geographic types
 
 ---
 
-## Phase 3: Contact & Enums (Week 3)
+## Phase 3: Contact & Enums (Week 3) - NEXT
 
 ### 3.1 Package: `contact` - Contact Information
 - [ ] Implement `PhoneNumber` type
@@ -183,7 +185,7 @@
 
 | Criteria | Target | Current |
 |----------|--------|---------|
-| Test Coverage | >90% | 95% (ids) |
+| Test Coverage | >90% | 95%+ (ids, money, geo) |
 | External Dependencies | 0 | 0 |
 | Linting Errors | 0 | 0 |
 | `go vet` Warnings | 0 | 0 |
@@ -196,13 +198,13 @@
 ## Package Dependency Order
 
 ```
-ids (no internal deps) ✅ COMPLETE
+ids (no internal deps) ✅ COMPLETE (95.0%)
     ↓
-money (no internal deps) ⏳ NEXT
+money (no internal deps) ✅ COMPLETE (95.2%)
     ↓
-geo (no internal deps)
+geo (no internal deps) ✅ COMPLETE (96.2%)
     ↓
-contact (no internal deps)
+contact (no internal deps) ⏳ NEXT
     ↓
 enums (no internal deps)
     ↓
