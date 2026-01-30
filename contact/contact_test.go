@@ -113,6 +113,77 @@ func TestPhoneNumber_Prefix(t *testing.T) {
 	}
 }
 
+func TestPhoneNumber_Operator(t *testing.T) {
+	tests := []struct {
+		name  string
+		phone PhoneNumber
+		want  Operator
+	}{
+		// Vodacom prefixes
+		{"prefix 82 is Vodacom", MustParsePhoneNumber("821234567"), OperatorVodacom},
+		{"prefix 84 is Vodacom", MustParsePhoneNumber("841234567"), OperatorVodacom},
+		{"prefix 85 is Vodacom", MustParsePhoneNumber("851234567"), OperatorVodacom},
+		// Movitel prefixes
+		{"prefix 83 is Movitel", MustParsePhoneNumber("831234567"), OperatorMovitel},
+		{"prefix 86 is Movitel", MustParsePhoneNumber("861234567"), OperatorMovitel},
+		// Tmcel prefix
+		{"prefix 87 is Tmcel", MustParsePhoneNumber("871234567"), OperatorTmcel},
+		// Zero value
+		{"zero value is Unknown", PhoneNumber{}, OperatorUnknown},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.phone.Operator(); got != tt.want {
+				t.Errorf("Operator() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestOperator_String(t *testing.T) {
+	tests := []struct {
+		name string
+		op   Operator
+		want string
+	}{
+		{"Vodacom", OperatorVodacom, "Vodacom"},
+		{"Movitel", OperatorMovitel, "Movitel"},
+		{"Tmcel", OperatorTmcel, "Tmcel"},
+		{"Unknown", OperatorUnknown, ""},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.op.String(); got != tt.want {
+				t.Errorf("String() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestOperator_Valid(t *testing.T) {
+	tests := []struct {
+		name string
+		op   Operator
+		want bool
+	}{
+		{"Vodacom is valid", OperatorVodacom, true},
+		{"Movitel is valid", OperatorMovitel, true},
+		{"Tmcel is valid", OperatorTmcel, true},
+		{"Unknown is invalid", OperatorUnknown, false},
+		{"arbitrary string is invalid", Operator("SomeOther"), false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.op.Valid(); got != tt.want {
+				t.Errorf("Valid() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestPhoneNumber_IsZero(t *testing.T) {
 	tests := []struct {
 		name  string

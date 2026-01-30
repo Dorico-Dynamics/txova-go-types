@@ -30,6 +30,35 @@ var ErrInvalidPhoneNumber = errors.New("invalid phone number")
 // ErrInvalidMobilePrefix is returned when the phone number has an invalid Mozambique mobile prefix.
 var ErrInvalidMobilePrefix = errors.New("invalid Mozambique mobile prefix")
 
+// Operator represents a Mozambique mobile network operator.
+type Operator string
+
+const (
+	// OperatorVodacom represents Vodacom Mozambique (prefixes 82, 84, 85).
+	OperatorVodacom Operator = "Vodacom"
+	// OperatorMovitel represents Movitel (prefixes 83, 86).
+	OperatorMovitel Operator = "Movitel"
+	// OperatorTmcel represents Tmcel (prefix 87).
+	OperatorTmcel Operator = "Tmcel"
+	// OperatorUnknown represents an unknown operator.
+	OperatorUnknown Operator = ""
+)
+
+// String returns the string representation of the operator.
+func (o Operator) String() string {
+	return string(o)
+}
+
+// Valid returns true if the operator is a known Mozambique mobile operator.
+func (o Operator) Valid() bool {
+	switch o {
+	case OperatorVodacom, OperatorMovitel, OperatorTmcel:
+		return true
+	default:
+		return false
+	}
+}
+
 // ParsePhoneNumber parses and normalizes a phone number to +258XXXXXXXXX format.
 // Accepts formats: "841234567", "+258841234567", "258841234567", "84 123 4567", etc.
 func ParsePhoneNumber(s string) (PhoneNumber, error) {
@@ -113,6 +142,21 @@ func (p PhoneNumber) Prefix() string {
 		return local[:2]
 	}
 	return ""
+}
+
+// Operator returns the mobile network operator for this phone number.
+// Returns OperatorUnknown for zero-value or invalid phone numbers.
+func (p PhoneNumber) Operator() Operator {
+	switch p.Prefix() {
+	case "82", "84", "85":
+		return OperatorVodacom
+	case "83", "86":
+		return OperatorMovitel
+	case "87":
+		return OperatorTmcel
+	default:
+		return OperatorUnknown
+	}
 }
 
 // IsZero returns true if the phone number is empty.
