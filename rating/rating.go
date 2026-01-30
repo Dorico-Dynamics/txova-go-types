@@ -2,10 +2,12 @@
 package rating
 
 import (
+	"bytes"
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"strconv"
 )
 
@@ -101,8 +103,8 @@ func (r Rating) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (r *Rating) UnmarshalJSON(data []byte) error {
-	// Handle null
-	if string(data) == "null" {
+	// Handle null (with whitespace tolerance)
+	if bytes.Equal(bytes.TrimSpace(data), []byte("null")) {
 		*r = Rating{}
 		return nil
 	}
@@ -183,6 +185,9 @@ func (r *Rating) Scan(src interface{}) error {
 		if v == 0 {
 			*r = Rating{}
 			return nil
+		}
+		if math.Trunc(v) != v {
+			return ErrInvalidRating
 		}
 		parsed, err := NewRating(int(v))
 		if err != nil {
