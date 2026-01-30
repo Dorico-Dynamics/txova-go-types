@@ -27,18 +27,36 @@ jobs:
     name: Send Slack Notification
     runs-on: ubuntu-latest
     steps:
+      - name: Check webhook configuration
+        id: check
+        env:
+          WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$WEBHOOK_URL" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "::warning::Slack webhook URL not configured, skipping notification"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Sanitize inputs
+        if: steps.check.outputs.skip != 'true'
         id: sanitize
+        env:
+          RAW_STATUS: ${{ inputs.status }}
+          RAW_VERSION: ${{ inputs.version }}
+          RAW_TRIGGERED_BY: ${{ inputs.triggered_by }}
         run: |
           sanitize() {
-            echo "$1" | jq -Rs '.' | sed 's/^"//;s/"$//'
+            printf '%s' "$1" | jq -Rs '.' | sed 's/^"//;s/"$//'
           }
 
-          echo "status=$(sanitize '${{ inputs.status }}')" >> $GITHUB_OUTPUT
-          echo "version=$(sanitize '${{ inputs.version }}')" >> $GITHUB_OUTPUT
-          echo "triggered_by=$(sanitize '${{ inputs.triggered_by }}')" >> $GITHUB_OUTPUT
+          echo "status=$(sanitize "$RAW_STATUS")" >> $GITHUB_OUTPUT
+          echo "version=$(sanitize "$RAW_VERSION")" >> $GITHUB_OUTPUT
+          echo "triggered_by=$(sanitize "$RAW_TRIGGERED_BY")" >> $GITHUB_OUTPUT
 
       - name: Set notification color and emoji
+        if: steps.check.outputs.skip != 'true'
         id: format
         run: |
           case "${{ steps.sanitize.outputs.status }}" in
@@ -70,9 +88,10 @@ jobs:
           esac
 
       - name: Send Slack notification
+        if: steps.check.outputs.skip != 'true'
         uses: slackapi/slack-github-action@v2.1.0
         with:
-          webhook: ${{ secrets.SLACK_WEBHOOK_TXOVA }}
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           webhook-type: incoming-webhook
           payload: |
             {
