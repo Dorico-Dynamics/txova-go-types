@@ -47,7 +47,7 @@ func ParseEmail(s string) (Email, error) {
 	local, domain := parts[0], parts[1]
 
 	// Local part constraints
-	if len(local) == 0 || len(local) > 64 {
+	if local == "" || len(local) > 64 {
 		return Email{}, ErrInvalidEmail
 	}
 
@@ -57,7 +57,7 @@ func ParseEmail(s string) (Email, error) {
 	}
 
 	// Domain part constraints
-	if len(domain) == 0 || len(domain) > 253 {
+	if domain == "" || len(domain) > 253 {
 		return Email{}, ErrInvalidEmail
 	}
 

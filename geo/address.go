@@ -21,6 +21,8 @@ func NewAddress(street, city, province, postalCode, country string) Address {
 }
 
 // IsEmpty returns true if the address has no data.
+//
+//nolint:gocritic // hugeParam: value receiver for consistency with String() and NewAddress()
 func (a Address) IsEmpty() bool {
 	return a.Street == "" && a.City == "" && a.Province == "" &&
 		a.PostalCode == "" && a.Country == ""
