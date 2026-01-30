@@ -763,6 +763,18 @@ func TestMoney_Text(t *testing.T) {
 		}
 	})
 
+	t.Run("unmarshal negative zero decimal", func(t *testing.T) {
+		t.Parallel()
+		// Edge case: "-0.50" where ParseInt("-0") = 0, but the value should be -50 centavos
+		var m Money
+		if err := m.UnmarshalText([]byte("-0.50")); err != nil {
+			t.Fatalf("UnmarshalText() error = %v", err)
+		}
+		if m.Centavos() != -50 {
+			t.Errorf("UnmarshalText('-0.50') = %d, want -50", m.Centavos())
+		}
+	})
+
 	t.Run("unmarshal single decimal digit", func(t *testing.T) {
 		t.Parallel()
 		var m Money

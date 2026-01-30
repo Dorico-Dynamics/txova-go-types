@@ -278,6 +278,9 @@ func (m *Money) UnmarshalText(data []byte) error {
 
 	// Try parsing as decimal (e.g., "150.00")
 	if strings.Contains(s, ".") {
+		// Track if original string is negative (handles "-0.50" case where ParseInt("-0") = 0)
+		isNegative := strings.HasPrefix(s, "-")
+
 		parts := strings.Split(s, ".")
 		if len(parts) != 2 {
 			return ErrInvalidAmount
@@ -303,7 +306,7 @@ func (m *Money) UnmarshalText(data []byte) error {
 			return fmt.Errorf("%w: invalid centavos part", ErrInvalidAmount)
 		}
 
-		if mzn < 0 {
+		if isNegative {
 			m.centavos = mzn*100 - cents
 		} else {
 			m.centavos = mzn*100 + cents

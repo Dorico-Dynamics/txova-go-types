@@ -37,8 +37,7 @@ func ParsePhoneNumber(s string) (PhoneNumber, error) {
 		return PhoneNumber{}, ErrInvalidPhoneNumber
 	}
 
-	// Remove all non-digit characters except leading +
-	hasPlus := strings.HasPrefix(s, "+")
+	// Remove all non-digit characters
 	digits := digitsOnly.ReplaceAllString(s, "")
 
 	if len(digits) == 0 {
@@ -53,10 +52,7 @@ func ParsePhoneNumber(s string) (PhoneNumber, error) {
 		// Local format: 841234567
 		localNumber = digits
 	case len(digits) == 12 && strings.HasPrefix(digits, MozambiqueCountryCode):
-		// Full format with country code: 258841234567
-		localNumber = digits[3:]
-	case hasPlus && len(digits) == 12 && strings.HasPrefix(digits, MozambiqueCountryCode):
-		// International format: +258841234567
+		// Full format with country code: 258841234567 or +258841234567
 		localNumber = digits[3:]
 	default:
 		return PhoneNumber{}, ErrInvalidPhoneNumber
