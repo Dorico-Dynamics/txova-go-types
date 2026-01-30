@@ -227,6 +227,11 @@ func TestMoney_Percentage(t *testing.T) {
 		{"50% odd amount", 10001, 50, 5001, false}, // rounds up
 		{"negative rate", 10000, -1, 0, true},
 		{"rate over 100", 10000, 101, 0, true},
+		// Negative amount tests
+		{"15% of -100 MZN", -10000, 15, -1500, false},
+		{"50% of -1001 centavos rounds away from zero", -1001, 50, -501, false},
+		{"50% of -1050 centavos", -1050, 50, -525, false},
+		{"15% of -105 centavos rounds", -105, 15, -16, false}, // -15.75 rounds to -16
 	}
 
 	for _, tt := range tests {
@@ -285,6 +290,11 @@ func TestMoney_Split(t *testing.T) {
 		{"split by one", 10000, 1, 10000, false},
 		{"split by zero", 10000, 0, 0, true},
 		{"negative split", 10000, -1, 0, true},
+		// Negative amount tests
+		{"negative even split", -10000, 2, -10000, false},
+		{"negative odd split", -10000, 3, -10000, false},
+		{"negative remainder", -10001, 3, -10001, false},
+		{"negative amount split by 4", -105, 4, -105, false},
 	}
 
 	for _, tt := range tests {
@@ -330,6 +340,31 @@ func TestMoney_Split(t *testing.T) {
 			if p.Centavos() != expected[i] {
 				t.Errorf("parts[%d] = %d, want %d", i, p.Centavos(), expected[i])
 			}
+		}
+	})
+
+	t.Run("negative remainder distribution detail", func(t *testing.T) {
+		t.Parallel()
+		m := FromCentavos(-105) // -1.05 MZN split 4 ways
+		parts, err := m.Split(4)
+		if err != nil {
+			t.Fatalf("Split(4) error = %v", err)
+		}
+		// -105 / 4 = -26 remainder -1 → adjusted to base=-27, remainder=3
+		// First 3 parts get -26, last gets -27
+		expected := []int64{-26, -26, -26, -27}
+		for i, p := range parts {
+			if p.Centavos() != expected[i] {
+				t.Errorf("parts[%d] = %d, want %d", i, p.Centavos(), expected[i])
+			}
+		}
+		// Verify sum
+		var sum int64
+		for _, p := range parts {
+			sum += p.Centavos()
+		}
+		if sum != -105 {
+			t.Errorf("sum = %d, want -105", sum)
 		}
 	})
 }

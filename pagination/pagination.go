@@ -193,24 +193,36 @@ type cursorData struct {
 	Offset    int    `json:"o,omitempty"`
 }
 
+// mustMarshalCursor marshals cursor data and panics on error.
+// This is safe because cursorData only contains primitive types (string, int64, int)
+// which cannot fail JSON marshaling.
+func mustMarshalCursor(data cursorData) []byte {
+	jsonBytes, err := json.Marshal(data)
+	if err != nil {
+		// This should never happen with primitive types, but handle defensively
+		panic(fmt.Sprintf("pagination: failed to marshal cursor data: %v", err))
+	}
+	return jsonBytes
+}
+
 // NewCursor creates a new cursor from an ID.
 func NewCursor(id string) Cursor {
 	data := cursorData{ID: id}
-	jsonBytes, _ := json.Marshal(data)
+	jsonBytes := mustMarshalCursor(data)
 	return Cursor{value: base64.URLEncoding.EncodeToString(jsonBytes)}
 }
 
 // NewCursorWithTimestamp creates a cursor with both ID and timestamp.
 func NewCursorWithTimestamp(id string, timestamp int64) Cursor {
 	data := cursorData{ID: id, Timestamp: timestamp}
-	jsonBytes, _ := json.Marshal(data)
+	jsonBytes := mustMarshalCursor(data)
 	return Cursor{value: base64.URLEncoding.EncodeToString(jsonBytes)}
 }
 
 // NewCursorWithOffset creates a cursor with an offset value.
 func NewCursorWithOffset(offset int) Cursor {
 	data := cursorData{Offset: offset}
-	jsonBytes, _ := json.Marshal(data)
+	jsonBytes := mustMarshalCursor(data)
 	return Cursor{value: base64.URLEncoding.EncodeToString(jsonBytes)}
 }
 

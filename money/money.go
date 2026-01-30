@@ -90,15 +90,21 @@ func (m Money) MultiplyInt(factor int) Money {
 
 // Percentage calculates the given percentage of the money amount.
 // Rate should be between 0 and 100 (e.g., 15 for 15%).
+// Rounding is applied to the nearest centavo (away from zero for negative amounts).
 func (m Money) Percentage(rate int) (Money, error) {
 	if rate < 0 || rate > 100 {
 		return Zero(), ErrInvalidPercentage
 	}
 	// Calculate: (centavos * rate) / 100, with rounding
-	result := (m.centavos * int64(rate)) / 100
-	remainder := (m.centavos * int64(rate)) % 100
+	product := m.centavos * int64(rate)
+	result := product / 100
+	remainder := product % 100
+
+	// Round to nearest centavo (away from zero)
 	if remainder >= 50 {
 		result++
+	} else if remainder <= -50 {
+		result--
 	}
 	return Money{centavos: result}, nil
 }
@@ -114,8 +120,8 @@ func (m Money) MustPercentage(rate int) Money {
 
 // Split divides the money amount into n equal parts.
 // Returns a slice of Money values. Any remainder centavos are distributed
-// to the first parts (one extra centavo each) to ensure the sum equals
-// the original amount.
+// to the first parts (one extra centavo each for positive amounts, or one
+// fewer centavo for negative amounts) to ensure the sum equals the original amount.
 func (m Money) Split(n int) ([]Money, error) {
 	if n <= 0 {
 		return nil, ErrNegativeSplit
@@ -123,6 +129,15 @@ func (m Money) Split(n int) ([]Money, error) {
 
 	base := m.centavos / int64(n)
 	remainder := m.centavos % int64(n)
+
+	// For negative amounts, remainder is negative (e.g., -105 % 4 = -1)
+	// We need to handle this by adjusting base down and making remainder positive
+	// so the distribution logic works correctly.
+	if remainder < 0 {
+		// Adjust: base becomes more negative, remainder becomes positive count
+		base--
+		remainder += int64(n)
+	}
 
 	parts := make([]Money, n)
 	for i := range n {
