@@ -138,3 +138,8 @@ issues:
 
     - path: _test\.go
       text: "fieldalignment"
+
+    # ids package has intentionally repetitive code for each typed ID
+    - path: ids/ids\.go
+      linters:
+        - dupl

@@ -124,7 +124,10 @@ jobs:
           version_changed="false"
 
           while IFS= read -r commit; do
-            if [[ "$commit" == *"BREAKING CHANGE:"* ]] || [[ "$commit" == *"!"* ]]; then
+            # Check for breaking changes using Conventional Commits format:
+            # - "BREAKING CHANGE:" anywhere in commit
+            # - "feat!:" or "fix!:" or "type(scope)!:" format
+            if [[ "$commit" == *"BREAKING CHANGE:"* ]] || [[ "$commit" =~ ^[a-z]+(\([^)]+\))?!: ]]; then
               major=$((major + 1))
               minor=0
               patch=0
