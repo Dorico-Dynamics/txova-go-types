@@ -18,7 +18,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.25'
+          go-version: "1.25"
 
       - name: Cache Go modules
         uses: actions/cache@v4
@@ -213,18 +213,36 @@ jobs:
           draft: false
           prerelease: false
 
-  notify:
-    name: Notify Release
+  notify-success:
+    name: Notify Success
+    needs: [release, version]
+    if: needs.version.outputs.version_changed == 'true'
+    uses: ./.github/workflows/notify-slack.yml
+    with:
+      status: SUCCESS
+      version: ${{ needs.version.outputs.new_version }}
+      triggered_by: ${{ github.actor }}
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_TXOVA }}
+
+  notify-failure:
+    name: Notify Failure
+    needs: [test, version, release]
+    if: failure()
+    uses: ./.github/workflows/notify-slack.yml
+    with:
+      status: FAILURE
+      version: ${{ needs.version.outputs.new_version || 'unknown' }}
+      triggered_by: ${{ github.actor }}
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_TXOVA }}
+
+  summary:
+    name: Release Summary
     needs: [release, version]
     if: needs.version.outputs.version_changed == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: Release Success Notification
-        run: |
-          echo "txova-go-types ${{ needs.version.outputs.new_version }} has been successfully released!"
-          echo "Go Module: github.com/Dorico-Dynamics/txova-go-types@${{ needs.version.outputs.new_version }}"
-          echo "Release: https://github.com/${{ github.repository }}/releases/tag/${{ needs.version.outputs.new_version }}"
-
       - name: Create release summary
         run: |
           VERSION="${{ needs.version.outputs.new_version }}"
