@@ -293,11 +293,12 @@ func (m *Money) UnmarshalText(data []byte) error {
 
 		// Pad or truncate centavos to 2 digits
 		centPart := parts[1]
-		if len(centPart) == 0 {
+		switch {
+		case centPart == "":
 			centPart = "00"
-		} else if len(centPart) == 1 {
-			centPart = centPart + "0"
-		} else if len(centPart) > 2 {
+		case len(centPart) == 1:
+			centPart += "0"
+		case len(centPart) > 2:
 			centPart = centPart[:2]
 		}
 

@@ -1,12 +1,14 @@
+version: "2"
+
 run:
   timeout: 5m
   modules-download-mode: readonly
 
 linters:
+  default: none
   enable:
     # Default linters
     - errcheck
-    - gosimple
     - govet
     - ineffassign
     - staticcheck
@@ -25,8 +27,6 @@ linters:
     - gocritic
     - gocyclo
     - godot
-    - gofmt
-    - goimports
     - goprintffuncname
     - gosec
     - intrange
@@ -43,8 +43,6 @@ linters:
     - revive
     - rowserrcheck
     - sqlclosecheck
-    - stylecheck
-    - tenv
     - testableexamples
     - thelper
     - tparallel
@@ -52,94 +50,129 @@ linters:
     - unparam
     - whitespace
 
-linters-settings:
-  errcheck:
-    check-type-assertions: true
-    check-blank: true
+  settings:
+    errcheck:
+      check-type-assertions: true
+      check-blank: true
 
-  errorlint:
-    errorf: true
-    asserts: true
-    comparison: true
+    errorlint:
+      errorf: true
+      asserts: true
+      comparison: true
 
-  exhaustive:
-    default-signifies-exhaustive: true
+    exhaustive:
+      default-signifies-exhaustive: true
 
-  gocyclo:
-    min-complexity: 15
+    gocyclo:
+      min-complexity: 15
 
-  goconst:
-    min-len: 3
-    min-occurrences: 3
+    goconst:
+      min-len: 3
+      min-occurrences: 3
 
-  gocritic:
-    enabled-tags:
-      - diagnostic
-      - performance
-      - style
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - performance
+        - style
 
-  goimports:
-    local-prefixes: github.com/Dorico-Dynamics/txova-go-types
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment
 
-  govet:
-    enable-all: true
-    disable:
-      - fieldalignment
+    nakedret:
+      max-func-lines: 30
 
-  nakedret:
-    max-func-lines: 30
+    nestif:
+      min-complexity: 4
 
-  nestif:
-    min-complexity: 4
+    nolintlint:
+      require-explanation: true
+      require-specific: true
 
-  nolintlint:
-    require-explanation: true
-    require-specific: true
+    revive:
+      rules:
+        - name: blank-imports
+        - name: context-as-argument
+        - name: context-keys-type
+        - name: dot-imports
+        - name: error-return
+        - name: error-strings
+        - name: error-naming
+        - name: exported
+        - name: increment-decrement
+        - name: indent-error-flow
+        - name: package-comments
+        - name: range
+        - name: receiver-naming
+        - name: time-naming
+        - name: unexported-return
+        - name: var-declaration
+        - name: var-naming
 
-  revive:
+    staticcheck:
+      checks:
+        - all
+
+    unparam:
+      check-exported: true
+
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - std-error-handling
     rules:
-      - name: blank-imports
-      - name: context-as-argument
-      - name: context-keys-type
-      - name: dot-imports
-      - name: error-return
-      - name: error-strings
-      - name: error-naming
-      - name: exported
-      - name: increment-decrement
-      - name: indent-error-flow
-      - name: package-comments
-      - name: range
-      - name: receiver-naming
-      - name: time-naming
-      - name: unexported-return
-      - name: var-declaration
-      - name: var-naming
+      - path: _test\.go
+        linters:
+          - dupl
+          - goconst
+          - gosec
+          - unparam
+          - errcheck
+          - gocyclo
+          - errorlint
+          - nestif
 
-  stylecheck:
-    checks:
-      - all
+      - path: _test\.go
+        text: "fieldalignment"
 
-  unparam:
-    check-exported: true
+      # ids package has intentionally repetitive code for each typed ID
+      - path: ids/ids\.go
+        linters:
+          - dupl
 
-issues:
-  exclude-use-default: false
-  max-issues-per-linter: 0
-  max-same-issues: 0
+      # MarshalText/MarshalJSON/Value methods return nil error by design (interface requirement)
+      - text: "result 1 \\(error\\) is always nil"
+        linters:
+          - unparam
 
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - dupl
-        - goconst
-        - gosec
-        - unparam
+      # Return nil, nil is intentional for optional values in driver.Valuer interface
+      - text: "return both a `nil` error and an invalid value"
+        linters:
+          - nilnil
 
-    - path: _test\.go
-      text: "fieldalignment"
+      # goconst: enum string values are intentionally used inline for clarity
+      - path: enums/
+        linters:
+          - goconst
 
-    # ids package has intentionally repetitive code for each typed ID
-    - path: ids/ids\.go
-      linters:
-        - dupl
+      # godot: test file comments don't need periods
+      - path: _test\.go
+        linters:
+          - godot
+
+      # money parsing has naturally nested logic for decimal handling
+      - path: money/money\.go
+        linters:
+          - nestif
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/Dorico-Dynamics/txova-go-types

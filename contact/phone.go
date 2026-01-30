@@ -22,7 +22,7 @@ const MozambiqueCountryCode = "258"
 var validMobilePrefixes = []string{"82", "83", "84", "85", "86", "87"}
 
 // digitsOnly matches all non-digit characters.
-var digitsOnly = regexp.MustCompile(`[^\d]`)
+var digitsOnly = regexp.MustCompile(`\D`)
 
 // ErrInvalidPhoneNumber is returned when a phone number cannot be parsed.
 var ErrInvalidPhoneNumber = errors.New("invalid phone number")
@@ -40,7 +40,7 @@ func ParsePhoneNumber(s string) (PhoneNumber, error) {
 	// Remove all non-digit characters
 	digits := digitsOnly.ReplaceAllString(s, "")
 
-	if len(digits) == 0 {
+	if digits == "" {
 		return PhoneNumber{}, ErrInvalidPhoneNumber
 	}
 

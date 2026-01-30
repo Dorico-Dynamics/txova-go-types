@@ -21,7 +21,7 @@ func NewAddress(street, city, province, postalCode, country string) Address {
 }
 
 // IsEmpty returns true if the address has no data.
-func (a Address) IsEmpty() bool {
+func (a *Address) IsEmpty() bool {
 	return a.Street == "" && a.City == "" && a.Province == "" &&
 		a.PostalCode == "" && a.Country == ""
 }
