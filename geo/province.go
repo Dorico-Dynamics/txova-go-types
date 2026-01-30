@@ -125,7 +125,11 @@ func (p *Province) UnmarshalText(data []byte) error {
 }
 
 // Value implements driver.Valuer for database storage.
+// Returns nil for zero-value Province to store NULL in database.
 func (p Province) Value() (driver.Value, error) {
+	if p == "" {
+		return nil, nil
+	}
 	return string(p), nil
 }
 

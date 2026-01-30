@@ -121,27 +121,46 @@ jobs:
 
           commits=$(git log ${{ steps.latest_tag.outputs.latest_tag }}..HEAD --pretty=format:"%s")
 
-          version_changed="false"
+          # Determine highest bump level: 0=none, 1=patch, 2=minor, 3=major
+          bump_level=0
 
           while IFS= read -r commit; do
             # Check for breaking changes using Conventional Commits format:
             # - "BREAKING CHANGE:" anywhere in commit
             # - "feat!:" or "fix!:" or "type(scope)!:" format
             if [[ "$commit" == *"BREAKING CHANGE:"* ]] || [[ "$commit" =~ ^[a-z]+(\([^)]+\))?!: ]]; then
+              bump_level=3
+              break  # Major is highest, no need to continue
+            elif [[ "$commit" == feat:* ]] || [[ "$commit" == feat\(*  ]]; then
+              if [ $bump_level -lt 2 ]; then
+                bump_level=2
+              fi
+            elif [[ "$commit" == fix:* ]] || [[ "$commit" == fix\(* ]]; then
+              if [ $bump_level -lt 1 ]; then
+                bump_level=1
+              fi
+            fi
+          done <<< "$commits"
+
+          # Apply version bump based on highest level found
+          version_changed="false"
+          case $bump_level in
+            3)
               major=$((major + 1))
               minor=0
               patch=0
               version_changed="true"
-              break
-            elif [[ "$commit" == feat:* ]] || [[ "$commit" == feat\(*  ]]; then
+              ;;
+            2)
               minor=$((minor + 1))
               patch=0
               version_changed="true"
-            elif [[ "$commit" == fix:* ]] || [[ "$commit" == fix\(* ]]; then
+              ;;
+            1)
               patch=$((patch + 1))
               version_changed="true"
-            fi
-          done <<< "$commits"
+              ;;
+          esac
 
           new_version="v${major}.${minor}.${patch}"
 

@@ -14,4 +14,4 @@ go.sum @Dorico-Dynamics/maintainers
 .gitignore @Dorico-Dynamics/maintainers
 
 # Documentation - can be reviewed by any team member
-*.md
+*.md @Dorico-Dynamics/maintainers

@@ -700,6 +700,8 @@ func TestFormatPageInfo(t *testing.T) {
 		{"last page partial", 95, 10, 100, "96-100 of 100"},
 		{"single item", 0, 10, 1, "1-1 of 1"},
 		{"empty", 0, 10, 0, "0 items"},
+		{"offset equals total", 5, 10, 5, "0 items"},
+		{"offset beyond total", 10, 10, 5, "0 items"},
 	}
 
 	for _, tt := range tests {

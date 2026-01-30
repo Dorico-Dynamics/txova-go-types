@@ -451,13 +451,15 @@ func (c CursorResponse[T]) Count() int {
 
 // FormatPageInfo returns a human-readable string describing the current page.
 func FormatPageInfo(offset, limit, total int) string {
+	// Handle edge cases: no items or offset beyond total
+	if total == 0 || offset >= total {
+		return "0 items"
+	}
+
 	start := offset + 1
 	end := offset + limit
 	if end > total {
 		end = total
-	}
-	if total == 0 {
-		return "0 items"
 	}
 	return fmt.Sprintf("%d-%d of %d", start, end, total)
 }

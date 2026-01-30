@@ -2,6 +2,7 @@ package contact
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 )
 
@@ -393,8 +394,8 @@ func TestParseEmail_LengthLimits(t *testing.T) {
 	})
 
 	t.Run("email too long", func(t *testing.T) {
-		// Create an email > 254 characters
-		longEmail := "user@" + string(make([]byte, 250)) + ".com"
+		// Create an email > 254 characters using valid characters
+		longEmail := "user@" + strings.Repeat("a", 250) + ".com"
 		_, err := ParseEmail(longEmail)
 		if err == nil {
 			t.Errorf("ParseEmail() should reject email > 254 chars")
