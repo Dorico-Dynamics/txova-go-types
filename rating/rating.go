@@ -58,8 +58,8 @@ func ParseRating(s string) (Rating, error) {
 	return NewRating(value)
 }
 
-// Value returns the integer value of the rating.
-func (r Rating) Value() int {
+// Int returns the integer value of the rating.
+func (r Rating) Int() int {
 	return r.value
 }
 
@@ -217,8 +217,8 @@ func (r *Rating) Scan(src interface{}) error {
 	}
 }
 
-// SQLValue implements driver.Valuer.
-func (r Rating) SQLValue() (driver.Value, error) {
+// Value implements driver.Valuer.
+func (r Rating) Value() (driver.Value, error) {
 	if r.IsZero() {
 		return nil, nil
 	}

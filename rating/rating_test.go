@@ -31,8 +31,8 @@ func TestNewRating(t *testing.T) {
 				t.Errorf("NewRating(%d) error = %v, wantErr %v", tt.value, err, tt.wantErr)
 				return
 			}
-			if got.Value() != tt.want {
-				t.Errorf("NewRating(%d) = %v, want %v", tt.value, got.Value(), tt.want)
+			if got.Int() != tt.want {
+				t.Errorf("NewRating(%d) = %v, want %v", tt.value, got.Int(), tt.want)
 			}
 		})
 	}
@@ -41,8 +41,8 @@ func TestNewRating(t *testing.T) {
 func TestMustNewRating(t *testing.T) {
 	t.Run("valid rating", func(t *testing.T) {
 		r := MustNewRating(5)
-		if r.Value() != 5 {
-			t.Errorf("MustNewRating() = %v, want 5", r.Value())
+		if r.Int() != 5 {
+			t.Errorf("MustNewRating() = %v, want 5", r.Int())
 		}
 	})
 
@@ -92,8 +92,8 @@ func TestParseRating(t *testing.T) {
 				t.Errorf("ParseRating(%q) error = %v, wantErr %v", tt.input, err, tt.wantErr)
 				return
 			}
-			if got.Value() != tt.want {
-				t.Errorf("ParseRating(%q) = %v, want %v", tt.input, got.Value(), tt.want)
+			if got.Int() != tt.want {
+				t.Errorf("ParseRating(%q) = %v, want %v", tt.input, got.Int(), tt.want)
 			}
 		})
 	}
@@ -235,8 +235,8 @@ func TestRating_JSON(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Unmarshal() error = %v", err)
 		}
-		if r.Value() != 4 {
-			t.Errorf("Unmarshal() = %v, want 4", r.Value())
+		if r.Int() != 4 {
+			t.Errorf("Unmarshal() = %v, want 4", r.Int())
 		}
 	})
 
@@ -283,8 +283,8 @@ func TestRating_JSON(t *testing.T) {
 		data, _ := json.Marshal(original)
 		var decoded Rating
 		_ = json.Unmarshal(data, &decoded)
-		if original.Value() != decoded.Value() {
-			t.Errorf("JSON roundtrip failed: %v != %v", original.Value(), decoded.Value())
+		if original.Int() != decoded.Int() {
+			t.Errorf("JSON roundtrip failed: %v != %v", original.Int(), decoded.Int())
 		}
 	})
 }
@@ -318,8 +318,8 @@ func TestRating_Text(t *testing.T) {
 		if err != nil {
 			t.Fatalf("UnmarshalText() error = %v", err)
 		}
-		if r.Value() != 4 {
-			t.Errorf("UnmarshalText() = %v, want 4", r.Value())
+		if r.Int() != 4 {
+			t.Errorf("UnmarshalText() = %v, want 4", r.Int())
 		}
 	})
 
@@ -350,8 +350,8 @@ func TestRating_SQL(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Scan() error = %v", err)
 		}
-		if r.Value() != 4 {
-			t.Errorf("Scan() = %v, want 4", r.Value())
+		if r.Int() != 4 {
+			t.Errorf("Scan() = %v, want 4", r.Int())
 		}
 	})
 
@@ -361,8 +361,8 @@ func TestRating_SQL(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Scan() error = %v", err)
 		}
-		if r.Value() != 4 {
-			t.Errorf("Scan() = %v, want 4", r.Value())
+		if r.Int() != 4 {
+			t.Errorf("Scan() = %v, want 4", r.Int())
 		}
 	})
 
@@ -372,8 +372,8 @@ func TestRating_SQL(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Scan() error = %v", err)
 		}
-		if r.Value() != 4 {
-			t.Errorf("Scan() = %v, want 4", r.Value())
+		if r.Int() != 4 {
+			t.Errorf("Scan() = %v, want 4", r.Int())
 		}
 	})
 
@@ -383,8 +383,8 @@ func TestRating_SQL(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Scan() error = %v", err)
 		}
-		if r.Value() != 4 {
-			t.Errorf("Scan() = %v, want 4", r.Value())
+		if r.Int() != 4 {
+			t.Errorf("Scan() = %v, want 4", r.Int())
 		}
 	})
 
@@ -394,8 +394,8 @@ func TestRating_SQL(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Scan() error = %v", err)
 		}
-		if r.Value() != 4 {
-			t.Errorf("Scan() = %v, want 4", r.Value())
+		if r.Int() != 4 {
+			t.Errorf("Scan() = %v, want 4", r.Int())
 		}
 	})
 
@@ -515,23 +515,23 @@ func TestRating_SQL(t *testing.T) {
 
 	t.Run("sql value valid", func(t *testing.T) {
 		r := MustNewRating(4)
-		v, err := r.SQLValue()
+		v, err := r.Value()
 		if err != nil {
-			t.Fatalf("SQLValue() error = %v", err)
+			t.Fatalf("Value() error = %v", err)
 		}
 		if v != int64(4) {
-			t.Errorf("SQLValue() = %v, want 4", v)
+			t.Errorf("Value() = %v, want 4", v)
 		}
 	})
 
 	t.Run("sql value zero", func(t *testing.T) {
 		var r Rating
-		v, err := r.SQLValue()
+		v, err := r.Value()
 		if err != nil {
-			t.Fatalf("SQLValue() error = %v", err)
+			t.Fatalf("Value() error = %v", err)
 		}
 		if v != nil {
-			t.Errorf("SQLValue() = %v, want nil", v)
+			t.Errorf("Value() = %v, want nil", v)
 		}
 	})
 }

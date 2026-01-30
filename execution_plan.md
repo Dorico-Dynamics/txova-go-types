@@ -166,7 +166,7 @@
 ### 5.2 Package: `vehicle` (new) - Vehicle Types - COMPLETE (98.8% coverage)
 - [x] Implement `LicensePlate` type with Mozambique format validation
 - [x] Support standard format (AAA-NNN-LL) and old format (AA-NN-NN)
-- [x] Implement `ProvinceCode` enum (MZ, MC, GA, IN, SO, MA, TE, ZA, NA, CD, NI)
+- [x] Implement `ProvinceCode` enum (MC, MP, GZ, IB, SF, MN, TT, ZB, NP, CA, NS)
 - [x] Add `Province()` method to extract province from plate
 - [x] Implement JSON, Text, and SQL interfaces
 - [x] Write comprehensive tests for both plate formats
