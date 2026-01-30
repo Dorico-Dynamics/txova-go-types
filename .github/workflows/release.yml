@@ -128,10 +128,11 @@ jobs:
             # Check for breaking changes using Conventional Commits format:
             # - "BREAKING CHANGE:" anywhere in commit
             # - "feat!:" or "fix!:" or "type(scope)!:" format
-            if [[ "$commit" == *"BREAKING CHANGE:"* ]] || [[ "$commit" =~ ^[a-z]+(\([^)]+\))?!: ]]; then
+            breaking_pattern='^[a-z]+(\([^)]+\))?!:'
+            if [[ "$commit" == *"BREAKING CHANGE:"* ]] || [[ "$commit" =~ $breaking_pattern ]]; then
               bump_level=3
               break  # Major is highest, no need to continue
-            elif [[ "$commit" == feat:* ]] || [[ "$commit" == feat\(*  ]]; then
+            elif [[ "$commit" == feat:* ]] || [[ "$commit" == feat\(* ]]; then
               if [ $bump_level -lt 2 ]; then
                 bump_level=2
               fi
